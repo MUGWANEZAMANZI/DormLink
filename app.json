@@ -1,39 +1,41 @@
 {
-  "expo": {
-    "name": "DormLink",
-    "slug": "DormLink",
-    "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
-    "newArchEnabled": true,
-    "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
+  "name": "DormLink",
+  "slug": "DormLink",
+  "version": "1.0.0",
+  "orientation": "portrait",
+  "icon": "./assets/icon.png",
+  "userInterfaceStyle": "light",
+  "newArchEnabled": true,
+  "splash": {
+    "image": "./assets/splash-icon.png",
+    "resizeMode": "contain",
+    "backgroundColor": "#ffffff"
+  },
+  "ios": {
+    "supportsTablet": true
+  },
+  "android": {
+    "adaptiveIcon": {
+      "foregroundImage": "./assets/adaptive-icon.png",
       "backgroundColor": "#ffffff"
     },
-    "ios": {
-      "supportsTablet": true
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "edgeToEdgeEnabled": true,
-      "permissions": [
-        "ACCESS_FINE_LOCATION",
-        "ACCESS_COARSE_LOCATION"
-      ],
-      "package": "com.kigaliwebartisans.dormlink"
-    },
-    "extra": {
-      "eas": {
-        "projectId": "f6d82b33-285c-4df7-a180-6fc30636691e"
-      }
-    },
-    "owner": "mmaudace"
+    "edgeToEdgeEnabled": true,
+    "permissions": [
+      "ACCESS_FINE_LOCATION",
+      "ACCESS_COARSE_LOCATION",
+      "ACCESS_BACKGROUND_LOCATION",
+      "ACCESS_FOREGROUND_LOCATION",
+      "READ_EXTERNAL_STORAGE",
+      "WRITE_EXTERNAL_STORAGE"
+    ],
+    "package": "com.kigaliwebartisans.dormlink"
   },
+  "extra": {
+    "eas": {
+      "projectId": "f6d82b33-285c-4df7-a180-6fc30636691e"
+    }
+  },
+  "owner": "mmaudace",
   "web": {
     "favicon": "./assets/favicon.png"
   },

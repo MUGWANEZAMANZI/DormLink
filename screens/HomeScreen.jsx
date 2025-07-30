@@ -1,25 +1,93 @@
-import { StyleSheet, View } from 'react-native';
-import Button from '../components/Button';
+import React, { useRef, useEffect} from 'react';
+import { Text, StyleSheet, 
+  View, Animated, Dimensions, 
+  TouchableWithoutFeedback  } from 'react-native';
+import { useState } from 'react';
+import { StatusBar } from 'react-native-web';
+
+
+const screenWidth = Dimensions.get('window').width;
+
 
 export default function HomeScreen({ navigation }) {
+
+  const leftWidth = useRef(new Animated.Value(screenWidth / 2)).current;
+  const rightWidth = useRef(new Animated.Value(screenWidth / 2)).current;
+
+
+  useEffect(() => {
+    resetWidths();
+  }, []);
+
+
+
+  const resetWidths = () => {
+    Animated.parallel([
+      Animated.timing(leftWidth, {
+        toValue: screenWidth /2,
+        duration: 300,
+        useNativeDriver: false,
+      }),
+
+      Animated.timing(rightWidth, {
+        toValue: screenWidth/2,
+        duration: 300,
+        useNativeDriver: false,
+      }),
+    ]).start();
+  };
+
+  const expandLeft = () => {
+    console.log("Expand Left tapped");
+     Animated.parallel([
+      Animated.timing(leftWidth, {
+        toValue: screenWidth * 0.75,
+        duration: 300,
+        useNativeDriver: false,
+      }),
+
+      Animated.timing(rightWidth, {
+        toValue: screenWidth * 0.25,
+        duration: 300,
+        useNativeDriver: false,
+      }),
+    ]).start();
+    navigation.navigate('FindDorm');
+  };
+
+
+  const expandRight = () => {
+     Animated.parallel([
+      Animated.timing(leftWidth, {
+        toValue: screenWidth * 0.25,
+        duration: 300,
+        useNativeDriver: false,
+      }),
+
+      Animated.timing(rightWidth, {
+        toValue: screenWidth * 0.75,
+        duration: 300,
+        useNativeDriver: false,
+      }),
+    ]).start();
+    navigation.navigate('AddDorm');
+  };
+
   return (
     <View style={styles.container}>
-      <View style={styles.row}>
-        <View style={styles.left}>
-          <Button
-            title="Shaka Inzu"
-            style={styles.shaka}
-            onPress={() => navigation.navigate('FindDorm')}
-          />
-        </View>
-        <View style={styles.right}>
-          <Button
-            title="Ranga Inzu"
-            style={styles.ranga}
-            onPress={() => navigation.navigate('AddDorm')}
-          />
-        </View>
-      </View>
+        <TouchableWithoutFeedback onPress={expandLeft}>
+          <Animated.View style={[styles.leftView, {width: leftWidth}]} >
+            <Text styles={styles.text}>Find Dorm</Text>
+            </Animated.View>
+        </TouchableWithoutFeedback>
+
+        <TouchableWithoutFeedback onPress={expandRight}>
+          <Animated.View style={[styles.rightView, {width: rightWidth}]} >
+            <Text styles={styles.text}>Rent Dorm</Text>
+            </Animated.View>
+        </TouchableWithoutFeedback>        
+        
+     
     </View>
   );
 }
@@ -27,26 +95,22 @@ export default function HomeScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    flexDirection: 'row'
+  },
+  leftView:{
+    backgroundColor: '#365474ff',
     justifyContent: 'center',
+    alignItems: 'center'
   },
-  row: {
-    flexDirection: 'row',
-    paddingHorizontal: 20,
-    justifyContent: 'space-around',
+  rightView:{
+    backgroundColor:"cyan",
+    justifyContent: 'center',
+    backgroundColor: '#2f693cff',
+     
   },
-  left: {
-    flex: 1,
-    alignItems: 'flex-start',
-  },
-  right: {
-    flex: 1,
-    alignItems: 'flex-end',
-  },
-  shaka: {
-    backgroundColor: '#007BFF',
-  },
-  ranga: {
-    backgroundColor: '#28A745',
-  },
+  text:{
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold'
+  }
 });
