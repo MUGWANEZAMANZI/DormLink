@@ -31,7 +31,8 @@
       "eas": {
         "projectId": "f6d82b33-285c-4df7-a180-6fc30636691e"
       }
-    }
+    },
+    "owner": "mmaudace"
   },
   "web": {
     "favicon": "./assets/favicon.png"

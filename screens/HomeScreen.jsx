@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     paddingHorizontal: 20,
-    justifyContent: 'space-between',
+    justifyContent: 'space-around',
   },
   left: {
     flex: 1,
