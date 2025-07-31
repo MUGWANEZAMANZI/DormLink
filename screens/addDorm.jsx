@@ -1,47 +1,70 @@
 import React, { useState } from "react";
-import { Text, TouchableOpacity, StyleSheet, View } from "react-native";
+import { Text, TouchableOpacity, Alert, TextInput, StyleSheet, View, ActivityIndicator } from "react-native";
 import { MapView, MarkerView, RasterSource, RasterLayer } from "@maplibre/maplibre-react-native";
 import * as Location from "expo-location";
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function AddDorm() {
   const [marker, setMarker] = useState(null);
   const [phone, setPhone] = useState("");
+  const [name, setName] = useState("");
   const [showInput, setShowInput] = useState(true);
   const [showInfo, setShowInfo] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleStart = async () => {
-    if (!phone) {
-      Alert.alert('Missing Info', 'Please enter your phone number.');
+    if (!phone || !name) {
+      Alert.alert('Missing Info', 'Please enter your name and phone number.');
       return;
     }
+    setLoading(true);
     try {
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
+        setLoading(false);
         Alert.alert('Permission Denied', 'Permission to access location was denied');
         return;
       }
       const location = await Location.getCurrentPositionAsync({});
       if (!location?.coords) {
+        setLoading(false);
         Alert.alert('Location Error', 'Could not get your current location.');
         return;
       }
       const coords = {
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
-        phone: phone
+        phone: phone,
+        name: name
       };
-      setMarker(coords);
-      setShowInput(false);
-      // Save to local storage
+      // Send to backend
       try {
-        const existingDorms = JSON.parse(await AsyncStorage.getItem('dorms')) || [];
-        existingDorms.push(coords);
-        await AsyncStorage.setItem('dorms', JSON.stringify(existingDorms));
-      } catch (storageErr) {
-        Alert.alert('Storage Error', 'Could not save dorm location.');
+        const response = await fetch('https://dormlink.up.railway.app/api/add-dorm', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            phone: phone,
+            name: name,
+            latitude: coords.latitude,
+            longitude: coords.longitude
+          })
+        });
+        if (!response.ok) {
+          setLoading(false);
+          const error = await response.json();
+          Alert.alert('Error', error.error || 'Failed to add dorm.');
+          return;
+        }
+        const data = await response.json();
+        setMarker(coords);
+        setShowInput(false);
+        setLoading(false);
+        Alert.alert('Success', 'Dorm added successfully!');
+      } catch (apiErr) {
+        setLoading(false);
+        Alert.alert('Network Error', 'Could not connect to server.');
       }
     } catch (err) {
+      setLoading(false);
       Alert.alert('Error', 'An unexpected error occurred.');
     }
   };
@@ -71,6 +94,8 @@ export default function AddDorm() {
               <View style={styles.infoBox}>
                 <Text style={styles.infoLabel}>Phone:</Text>
                 <Text style={styles.infoText}>{marker.phone}</Text>
+                <Text style={styles.infoLabel}>Name:</Text>
+                <Text style={styles.infoText}>{marker.name}</Text>
               </View>
             )}
           </MarkerView>
@@ -78,7 +103,16 @@ export default function AddDorm() {
       </MapView>
       {showInput && (
         <View style={styles.inputContainer}>
-          <Text style={styles.promptText}>Click Start and enter your phone number</Text>
+          <Text style={styles.promptText}>Click Start and enter your name and phone number</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+            <Text style={styles.inputLabel}>Name:</Text>
+            <TextInput
+              style={styles.input}
+              value={name}
+              onChangeText={setName}
+              placeholder="Enter your name"
+            />
+          </View>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <Text style={styles.inputLabel}>Phone:</Text>
             <TextInput
@@ -89,8 +123,8 @@ export default function AddDorm() {
               keyboardType="phone-pad"
             />
           </View>
-          <TouchableOpacity style={styles.button} onPress={handleStart}>
-            <Text style={styles.buttonText}>Start</Text>
+          <TouchableOpacity style={styles.button} onPress={handleStart} disabled={loading}>
+            {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Start</Text>}
           </TouchableOpacity>
         </View>
       )}

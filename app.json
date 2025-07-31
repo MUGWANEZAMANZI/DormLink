@@ -24,9 +24,7 @@
       "ACCESS_FINE_LOCATION",
       "ACCESS_COARSE_LOCATION",
       "ACCESS_BACKGROUND_LOCATION",
-      "ACCESS_FOREGROUND_LOCATION",
-      "READ_EXTERNAL_STORAGE",
-      "WRITE_EXTERNAL_STORAGE"
+      "ACCESS_FOREGROUND_LOCATION"
     ],
     "package": "com.kigaliwebartisans.dormlink"
   },
