@@ -19,6 +19,8 @@ export default function FindDorm() {
         const { status } = await Location.requestForegroundPermissionsAsync();
         if (status === 'granted') {
           const loc = await Location.getCurrentPositionAsync({});
+          // Debug log
+          console.log('User Location:', loc.coords);
           setUserLocation(loc.coords);
         }
       } catch (e) {}
@@ -28,14 +30,30 @@ export default function FindDorm() {
         const response = await fetch('https://dormlink.up.railway.app/api/dorms');
         if (!response.ok) throw new Error('Failed to fetch dorms');
         const data = await response.json();
+        // Debug log
+        console.log('Fetched Dorms:', data);
         setMarkers(data);
+        setLoadingDorms(false);
       } catch (e) {
         Alert.alert('Error', 'Could not load dorms from server.');
+        setLoadingDorms(false);
       }
     };
     loadDorms();
   }, []);
 
+  // Coordinate validation helper
+  const isValidCoord = (coord) =>
+    coord &&
+    typeof coord.latitude === 'number' &&
+    typeof coord.longitude === 'number' &&
+    !isNaN(coord.latitude) &&
+    !isNaN(coord.longitude);
+
+  // Only use valid markers
+  const validMarkers = markers.filter(isValidCoord);
+  const validUserLocation = isValidCoord(userLocation) ? userLocation : null;
+  const [loadingDorms, setLoadingDorms] = useState(true);
   const handleReport = async () => {
     if (!reportName || !reportPhone || !reportReason) {
       Alert.alert('Missing Info', 'Please fill all fields.');
@@ -69,16 +87,37 @@ export default function FindDorm() {
     }
   };
 
+  // Show loading indicator if still loading dorms and no valid coordinates
+  if (loadingDorms && !validUserLocation && validMarkers.length === 0) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
+  // If no valid coordinates at all, show fallback message
+  if (!validUserLocation && validMarkers.length === 0) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Text>No dorms or location found.</Text>
+      </View>
+    );
+  }
+
+  // Pick center coordinate safely
+  const centerCoordinate = validUserLocation
+    ? [validUserLocation.longitude, validUserLocation.latitude]
+    : validMarkers.length > 0
+      ? [validMarkers[0].longitude, validMarkers[0].latitude]
+      : [30.1, -1.95];
+
   return (
     <View style={{ flex: 1 }}>
       <MapView
         style={{ flex: 1 }}
         camera={{
-          centerCoordinate: userLocation
-            ? [userLocation.longitude, userLocation.latitude]
-            : markers[0]
-              ? [markers[0].longitude, markers[0].latitude]
-              : [30.1, -1.95],
+          centerCoordinate,
           zoom: 13,
         }}
       >
@@ -91,12 +130,12 @@ export default function FindDorm() {
           <RasterLayer id="maptiler-layer" sourceID="maptiler" />
         </RasterSource>
         {/* User's live location marker */}
-        {userLocation && (
-          <MarkerView coordinate={userLocation}>
+        {validUserLocation && (
+          <MarkerView coordinate={validUserLocation}>
             <Text style={{ fontSize: 24, color: 'blue' }}>📍</Text>
           </MarkerView>
         )}
-        {markers.map((coord, index) => (
+        {validMarkers.map((coord, index) => (
           <MarkerView key={index} coordinate={coord}>
             <TouchableOpacity onPress={() => { setSelectedDorm(coord); setReportModal(true); }}>
               <Text style={{ fontSize: 24 }}>🏠</Text>

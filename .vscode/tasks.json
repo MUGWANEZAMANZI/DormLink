@@ -1,0 +1,15 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "shell",
+			"label": "Expo Build Android APK",
+			"command": "npx expo build:android",
+			"group": "build",
+			"isBackground": false,
+			"problemMatcher": [
+				"$eslint-stylish"
+			]
+		}
+	]
+}

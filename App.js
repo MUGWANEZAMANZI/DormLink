@@ -15,6 +15,7 @@ export default function App() {
     (async () => {
       // Request location permission
       await Location.requestForegroundPermissionsAsync();
+      console.log("App started");
     })();
   }, []);
   return (
