@@ -125,7 +125,7 @@ export default function AddDorm() {
             </RasterSource>
             {/* Only render marker if valid */}
             {isValidCoord(marker) && (
-              <MarkerView coordinate={{ latitude: marker.latitude, longitude: marker.longitude }}>
+              <MarkerView coordinate={[marker.longitude, marker.latitude]}>
                 <TouchableOpacity onPress={() => setShowInfo((prev) => !prev)}>
                   <Text style={styles.markerText}>🏠</Text>
                 </TouchableOpacity>

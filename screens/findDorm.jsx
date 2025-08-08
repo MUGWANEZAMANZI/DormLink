@@ -131,12 +131,12 @@ export default function FindDorm() {
         </RasterSource>
         {/* User's live location marker */}
         {validUserLocation && (
-          <MarkerView coordinate={validUserLocation}>
+          <MarkerView coordinate={[validUserLocation.longitude, validUserLocation.latitude]}>
             <Text style={{ fontSize: 24, color: 'blue' }}>📍</Text>
           </MarkerView>
         )}
         {validMarkers.map((coord, index) => (
-          <MarkerView key={index} coordinate={coord}>
+          <MarkerView key={index} coordinate={[coord.longitude, coord.latitude]}>
             <TouchableOpacity onPress={() => { setSelectedDorm(coord); setReportModal(true); }}>
               <Text style={{ fontSize: 24 }}>🏠</Text>
             </TouchableOpacity>
